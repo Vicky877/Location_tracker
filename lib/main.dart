@@ -15,9 +15,7 @@ void main() async {
   final appDocumentDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
   await Hive.initFlutter();
-  print("check");
   location = await Hive.openBox('location');
-  print(location.values);
   Hive.registerAdapter(locationTrackerAdapter());
   runApp(MyApps());
 }

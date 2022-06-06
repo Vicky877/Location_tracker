@@ -41,7 +41,7 @@ class _mapScreenState extends State<mapScreen> {
           target: LatLng(lats, longs),
           zoom: 10.0,
         ),
-        mapType: MapType.normal,
+        mapType: MapType.terrain,
       ),
     );
   }

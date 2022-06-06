@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -14,10 +16,17 @@ class locationPage extends StatefulWidget {
 
 class _locationPageState extends State<locationPage> {
   List<dynamic> _items = [];
+  late AnimationController loadingcontroller;
+  bool _loading = true;
 
+  //@override
   @override
+  void initState() {
+    super.initState();
+    _refreshItems();
+  }
+
   void _refreshItems() {
-    print("refresh");
     var data = location.keys.map((key) {
       var value = location.get(key);
       return {
@@ -29,12 +38,8 @@ class _locationPageState extends State<locationPage> {
     }).toList();
 
     setState(() {
-      print("resdsdsdsdsds");
       _items = data.reversed.toList();
       place = _items;
-      print("fuckkkkkkkkkkkkkkkkkkkkk");
-      print(_items);
-      print(place);
     });
   }
 
@@ -112,8 +117,6 @@ class _locationPageState extends State<locationPage> {
             itemCount: _items.length,
             itemBuilder: (context, index) {
               final currentItem = _items[index];
-              print("object.............................");
-              print(location.get(index)['location']);
               //int newIndex = index + 1;
               return Card(
                 child: ListTile(
@@ -121,17 +124,12 @@ class _locationPageState extends State<locationPage> {
                   onTap: () {
                     var latta = place[index]['latitude'];
                     var longss = place[index]['longitude'];
-                    print(latta);
-                    print(latta.runtimeType);
-                    print(longss);
+
                     // lat = (addlocations[index]["latitude"]);
                     lats = double.parse("$latta");
                     longs = double.parse("$longss");
-                    print(lat);
-                    print(lat.runtimeType);
                     // long = (addlocations[index]["longitude"]);
                     // lats = double.parse("$lat");
-                    // print(lats);
                     //longs = double.parse("$long");
                     Navigator.push(
                       context,
@@ -154,7 +152,6 @@ class _locationPageState extends State<locationPage> {
         foregroundColor: Colors.white,
         onPressed: () {
           onAlertWithCustomContentPressed(context);
-          print("object");
         },
       ),
     );
