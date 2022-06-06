@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:ffi';
 
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../bottomNaigate.dart';
 import '../constants.dart';
@@ -12,10 +14,41 @@ class locationPage extends StatefulWidget {
   State<locationPage> createState() => _locationPageState();
 }
 
-bool _loading = true;
-
 class _locationPageState extends State<locationPage> {
+  List<dynamic> _items = [];
+  late AnimationController loadingcontroller;
+  bool _loading = true;
+
+  //@override
   @override
+  void initState() {
+    super.initState();
+    _refreshItems();
+  }
+
+  void _refreshItems() {
+    var data = location.keys.map((key) {
+      var value = location.get(key);
+      return {
+        "key": key,
+        "location": value["location"],
+        "latitude": value['latitude'],
+        "longitude": value['longitude']
+      };
+    }).toList();
+
+    setState(() {
+      _items = data.reversed.toList();
+      place = _items;
+    });
+  }
+
+  Future<void> _location(Map<String, dynamic> newItem) async {
+    final location = Hive.box('location');
+    await location.add(newItem);
+    _refreshItems();
+  }
+
   onAlertWithCustomContentPressed(context) {
     Alert(
         context: context,
@@ -30,12 +63,14 @@ class _locationPageState extends State<locationPage> {
             ),
             TextFormField(
               controller: latitudeController,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Latitude',
               ),
             ),
             TextFormField(
               controller: longitudeController,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Longitude ',
               ),
@@ -46,13 +81,13 @@ class _locationPageState extends State<locationPage> {
           DialogButton(
             color: Colors.green,
             onPressed: () {
-              Navigator.pop(context);
-              Future.delayed(Duration(seconds: 1), () {
-                Color.fromARGB(255, 38, 45, 189);
-                setState(() {
-                  _loading = false;
-                });
+              _location({
+                "location": placeController.text,
+                "latitude": latitudeController.text,
+                "longitude": longitudeController.text,
               });
+              Navigator.pop(context);
+
               var dis = {};
               dis["location"] = placeController.text;
               dis["longitude"] = longitudeController.text;
@@ -78,31 +113,36 @@ class _locationPageState extends State<locationPage> {
       ),
       body: Center(
         child: ListView.builder(
-            itemCount: addlocations.length,
+            //location=Hive.box("locaion");
+            itemCount: _items.length,
             itemBuilder: (context, index) {
-              int newIndex = index + 1;
+              final currentItem = _items[index];
+              //int newIndex = index + 1;
               return Card(
                 child: ListTile(
-                    leading: Text("$newIndex"),
-                    onTap: () {
-                      lat = (addlocations[index]["latitude"]);
-                      long = (addlocations[index]["longitude"]);
-                      lats = double.parse("$lat");
-                      print(lats);
-                      longs = double.parse("$long");
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => mapScreen()),
-                      );
-                    },
-                    trailing: Text(
-                      addlocations[index]["longitude"].toString() +
-                          "    " +
-                          addlocations[index]["latitude"].toString(),
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 2, 2, 2), fontSize: 15),
-                    ),
-                    title: Text(addlocations[index]["location"].toString())),
+                  leading: Text(currentItem['location']),
+                  onTap: () {
+                    var latta = place[index]['latitude'];
+                    var longss = place[index]['longitude'];
+
+                    // lat = (addlocations[index]["latitude"]);
+                    lats = double.parse("$latta");
+                    longs = double.parse("$longss");
+                    // long = (addlocations[index]["longitude"]);
+                    // lats = double.parse("$lat");
+                    //longs = double.parse("$long");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => mapScreen()),
+                    );
+                  },
+                  trailing: Text(
+                    currentItem["longitude"] + "    " + currentItem["latitude"],
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 2, 2, 2), fontSize: 15),
+                  ),
+                  //title: Text(addlocations[index]["location"].toString())
+                ),
               );
             }),
       ),
@@ -112,7 +152,6 @@ class _locationPageState extends State<locationPage> {
         foregroundColor: Colors.white,
         onPressed: () {
           onAlertWithCustomContentPressed(context);
-          print("object");
         },
       ),
     );

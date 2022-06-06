@@ -11,9 +11,19 @@ class mapScreen extends StatefulWidget {
 }
 
 class _mapScreenState extends State<mapScreen> {
-  Completer<GoogleMapController> _controller = Completer();
-
   LatLng _center = LatLng(lats, longs);
+  Completer<GoogleMapController> _controller = Completer();
+  List<Marker> _markers = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _markers.add(Marker(
+      markerId: MarkerId('1'),
+      position: LatLng(lats, longs),
+    ));
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
@@ -23,11 +33,15 @@ class _mapScreenState extends State<mapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
-        onMapCreated: _onMapCreated,
+        markers: Set<Marker>.of(_markers),
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
         initialCameraPosition: CameraPosition(
-          target: _center,
+          target: LatLng(lats, longs),
           zoom: 10.0,
         ),
+        mapType: MapType.terrain,
       ),
     );
   }

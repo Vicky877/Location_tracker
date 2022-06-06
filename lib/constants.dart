@@ -11,3 +11,5 @@ double lats = 0;
 double longs = 0;
 List addlocations = [];
 bool _validate = false;
+var location;
+List<dynamic> place = [];
