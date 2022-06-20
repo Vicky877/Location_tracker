@@ -6,8 +6,8 @@ class locationTracker extends HiveObject {
   @HiveField(0)
   late String location;
   @HiveField(1)
-  late String latitude;
+  late double latitude;
   @HiveField(2)
-  late String longitude;
+  late double longitude;
   locationTracker(this.location, this.latitude, this.longitude);
 }

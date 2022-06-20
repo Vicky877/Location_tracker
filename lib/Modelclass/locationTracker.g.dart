@@ -18,8 +18,8 @@ class locationTrackerAdapter extends TypeAdapter<locationTracker> {
     };
     return locationTracker(
       fields[0] as String,
-      fields[1] as String,
-      fields[2] as String,
+      fields[1] as double,
+      fields[2] as double,
     );
   }
 

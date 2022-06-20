@@ -17,11 +17,15 @@ class _mapScreenState extends State<mapScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    print(
+        "checkkkkvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+    print(_markers);
     _markers.add(Marker(
-      markerId: MarkerId('1'),
-      position: LatLng(lats, longs),
+      consumeTapEvents: true,
+      markerId: MarkerId('marker'),
+      position: LatLng(11.0168, 76.9558),
+      infoWindow: InfoWindow(title: "Title", snippet: "Good\nMorning"),
     ));
   }
 
@@ -32,6 +36,24 @@ class _mapScreenState extends State<mapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: const Text('Your Location',
+              style: TextStyle(
+                fontSize: 22,
+                letterSpacing: 1.0,
+              )),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xff784cc6), Color(0xff3dc1fd)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: GoogleMap(
         markers: Set<Marker>.of(_markers),
         onMapCreated: (GoogleMapController controller) {
@@ -39,7 +61,7 @@ class _mapScreenState extends State<mapScreen> {
         },
         initialCameraPosition: CameraPosition(
           target: LatLng(lats, longs),
-          zoom: 10.0,
+          zoom: 14.0,
         ),
         mapType: MapType.terrain,
       ),
