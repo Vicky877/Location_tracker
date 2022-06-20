@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-var formKey = GlobalKey<FormState>();
 var textFieldController = TextEditingController();
 var placeController = TextEditingController();
 var longitudeController = TextEditingController();
@@ -13,3 +12,4 @@ List addlocations = [];
 bool _validate = false;
 var location;
 List<dynamic> place = [];
+final formGlobalKey = GlobalKey<FormState>();

@@ -23,10 +23,10 @@ class _locationPageState extends State<locationPage> {
   @override
   void initState() {
     super.initState();
-    _refreshItems();
+    _refershLocation();
   }
 
-  void _refreshItems() {
+  void _refershLocation() {
     var data = location.keys.map((key) {
       var value = location.get(key);
       return {
@@ -46,47 +46,75 @@ class _locationPageState extends State<locationPage> {
   Future<void> _location(Map<String, dynamic> newItem) async {
     final location = Hive.box('location');
     await location.add(newItem);
-    _refreshItems();
+    _refershLocation();
   }
 
   onAlertWithCustomContentPressed(context) {
     Alert(
         context: context,
         title: "Add Location Details",
-        content: Column(
-          children: <Widget>[
-            TextFormField(
-              controller: placeController,
-              decoration: InputDecoration(
-                labelText: 'Name',
+        content: Form(
+          key: formGlobalKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                controller: placeController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                ),
+                validator: (value) {
+                  if (value!.trim().isEmpty) {
+                    return "Invalid Name";
+                  } else {
+                    return null;
+                  }
+                },
               ),
-            ),
-            TextFormField(
-              controller: latitudeController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Latitude',
+              TextFormField(
+                controller: latitudeController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Latitude',
+                ),
+                validator: (value) {
+                  if (value!.trim().isEmpty ||
+                      RegExp(r'^[0-9]+$').hasMatch(value)) {
+                    return "Invalid Latitude";
+                  } else {
+                    return null;
+                  }
+                },
               ),
-            ),
-            TextFormField(
-              controller: longitudeController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Longitude ',
+              TextFormField(
+                controller: longitudeController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Longitude ',
+                ),
+                validator: (value) {
+                  if (value!.trim().isEmpty ||
+                      RegExp(r'^[0-9]+$').hasMatch(value)) {
+                    return "Invalid Longitude";
+                  } else {
+                    return null;
+                  }
+                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         buttons: [
           DialogButton(
-            color: Colors.green,
+            color: Color(0xff784cc6),
             onPressed: () {
-              _location({
-                "location": placeController.text,
-                "latitude": latitudeController.text,
-                "longitude": longitudeController.text,
-              });
-              Navigator.pop(context);
+              if (formGlobalKey.currentState!.validate()) {
+                _location({
+                  "location": placeController.text,
+                  "latitude": latitudeController.text,
+                  "longitude": longitudeController.text,
+                });
+                Navigator.pop(context);
+              }
 
               var dis = {};
               dis["location"] = placeController.text;
@@ -108,47 +136,68 @@ class _locationPageState extends State<locationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Pick your Location")),
-        backgroundColor: Colors.green,
+        title: Center(
+            child: Text("Add your Location",
+                style: TextStyle(
+                  fontSize: 22,
+                  letterSpacing: 1.0,
+                ))),
+        //backgroundColor: Colors.green,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xff784cc6), Color(0xff3dc1fd)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Center(
-        child: ListView.builder(
-            //location=Hive.box("locaion");
-            itemCount: _items.length,
-            itemBuilder: (context, index) {
-              final currentItem = _items[index];
-              //int newIndex = index + 1;
-              return Card(
-                child: ListTile(
-                  leading: Text(currentItem['location']),
-                  onTap: () {
-                    var latta = place[index]['latitude'];
-                    var longss = place[index]['longitude'];
-
-                    // lat = (addlocations[index]["latitude"]);
-                    lats = double.parse("$latta");
-                    longs = double.parse("$longss");
-                    // long = (addlocations[index]["longitude"]);
-                    // lats = double.parse("$lat");
-                    //longs = double.parse("$long");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => mapScreen()),
-                    );
-                  },
-                  trailing: Text(
-                    currentItem["longitude"] + "    " + currentItem["latitude"],
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 2, 2, 2), fontSize: 15),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10.0, left: 5, right: 5),
+          child: ListView.builder(
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final currentItem = _items[index];
+                int newIndex = index + 1;
+                return Card(
+                  child: ListTile(
+                    leading: Text(
+                      newIndex.toString() + "    " + currentItem['location'],
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    onTap: () {
+                      var latta = place[index]['latitude'];
+                      var longss = place[index]['longitude'];
+                      lats = double.parse("$latta");
+                      longs = double.parse("$longss");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => mapScreen()),
+                      );
+                    },
+                    trailing: Text(
+                      currentItem["longitude"] +
+                          "    " +
+                          currentItem["latitude"],
+                      style: TextStyle(
+                        fontSize: 15,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ),
-                  //title: Text(addlocations[index]["location"].toString())
-                ),
-              );
-            }),
+                );
+              }),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xff784cc6),
         foregroundColor: Colors.white,
         onPressed: () {
           onAlertWithCustomContentPressed(context);
