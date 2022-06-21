@@ -2,7 +2,7 @@
     package="com.example.location_picker">
    <application
     
-        android:label="location_picker"
+        android:label="Location_picker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
